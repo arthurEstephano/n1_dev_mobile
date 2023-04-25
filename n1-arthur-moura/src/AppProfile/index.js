@@ -52,7 +52,7 @@ export default function AppProfile({ route }) {
                 return (fNome + ' ' + sNome);
             }
             else{
-                return (fNome + ' ');
+                return (fNome);
             }
         }
     }
