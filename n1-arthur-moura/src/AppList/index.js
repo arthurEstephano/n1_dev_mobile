@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -31,7 +30,6 @@ export default function AppList() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
       <View style={styles.line}>
         <Text style={styles.title}>Contatos</Text>
         <TouchableOpacity onPress={()=>addContato()}>
@@ -39,10 +37,11 @@ export default function AppList() {
         </TouchableOpacity>
       </View>
       <ScrollView
+        automaticallyAdjustKeyboardInsets={true}
         style={styles.scrollContainer}
         contentContainerStyle={styles.itemsContainer}>
         {items.map(item => {
-          return <AppItem key={item.id} id={item.id} fNome={item.fNome} sNome={item.sNome} empresa={item.empresa} telefone={item.telefone} email={item.email} dataNasc={item.dataNasc} end={item.end} apelido={item.apelido} notas={item.notas} item={item.fNome +' ' + item.sNome + ' ' + item.empresa} />
+          return <AppItem key={item.id} id={item.id} fNome={item.fNome} sNome={item.sNome} empresa={item.empresa} telefone={item.telefone} email={item.email} dataNasc={item.dataNasc} end={item.end} apelido={item.apelido} notas={item.notas} image={item.image} me={item.me} item={item.fNome +' ' + item.sNome + ' ' + item.empresa}  />
         })}
       </ScrollView>
     </View>
@@ -87,12 +86,13 @@ const styles = StyleSheet.create({
   },
   itemsContainer: {
     flex: 1,
-    marginTop: 5,
+    marginTop: 10,
+    marginBottom: 50,
     padding: 20,
-    borderTopWidth: 10,
     borderBottomWidth: 10,
     borderColor: "#666666",
-    alignItems: 'stretch',
+    justifyContent: 'flex-start',
+    alignContent: 'center',
     backgroundColor: '#000'
   }
 });

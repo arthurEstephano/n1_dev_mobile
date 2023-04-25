@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage'
-
+import Icon from "@expo/vector-icons/MaterialCommunityIcons";
+import { Avatar } from "@react-native-material/core";
 
 export default function AppProfile({ route }) {
     const navigation = useNavigation();
@@ -15,6 +16,7 @@ export default function AppProfile({ route }) {
         navigation.navigate('AppEdit', route.params);
       }
 
+    const [image,setImage]=useState(null)
     const [fNome, setFNome] = useState('');
     const [sNome, setsNome] = useState('');
     const [empresa, setEmpresa] = useState('');
@@ -37,6 +39,7 @@ export default function AppProfile({ route }) {
             setEnd(obj.end)
             setApelido(obj.apelido)
             setNotas(obj.notas)
+            setImage(obj.image)
         }
     })
 
@@ -45,7 +48,12 @@ export default function AppProfile({ route }) {
             return (apelido);
         }
         else{
-            return (fNome + ' ' + sNome);
+            if(sNome != '' || sNome != undefined){
+                return (fNome + ' ' + sNome);
+            }
+            else{
+                return (fNome + ' ');
+            }
         }
     }
 
@@ -64,6 +72,13 @@ export default function AppProfile({ route }) {
                 </TouchableOpacity>
             </View>
             <Text style={styles.title}>{nomeTitulo() + ' ' + empresa}</Text>
+            <Avatar
+                style={styles.imageAvatar}
+                size={72}
+                image={{ uri: image }}
+                label={fNome}
+                icon={props => <Icon name="account" {...props} />}>
+            </Avatar>
             <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.inputContainer}>
                 <TextInput
                     editable={false}
@@ -118,6 +133,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#000',
         alignItems: 'center',
     },
+    imageAvatar:{
+        alignContent: 'center',
+        alignSelf: 'center',
+        marginTop: 5,
+      },
     line: {
         display: 'flex',
         flexDirection: 'row',
@@ -136,8 +156,8 @@ const styles = StyleSheet.create({
       },
     inputContainer: {
         flex: 1,
-        marginTop: 30,
-        width: '90%',
+        marginTop: 5,
+        width: '100%',
         padding: 20,
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,

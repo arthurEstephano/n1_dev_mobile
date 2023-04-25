@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage'
-
+import Icon from "@expo/vector-icons/MaterialCommunityIcons";
+import { Avatar } from "@react-native-material/core";
+import * as ImagePicker from 'expo-image-picker';
 
 export default function AppEdit({ route }) {
     const navigation = useNavigation();
@@ -15,6 +17,7 @@ export default function AppEdit({ route }) {
         navigation.navigate('AppList');
     }
 
+    const [image, setImage] = useState(route.params.image)
     const [id, setId] = useState(route.params.id);
     const [fNome, setFNome] = useState(route.params.fNome);
     const [sNome, setsNome] = useState(route.params.sNome);
@@ -60,6 +63,35 @@ export default function AppEdit({ route }) {
 
     function notasChanged(notas) {
         setNotas(notas);
+    }
+
+    const nomeTitulo = () => {
+        if(apelido != '' || apelido != undefined){
+            return (apelido);
+        }
+        else{
+            return (fNome + ' ' + sNome);
+        }
+    }
+
+    const imageChange = async () => {
+        // Pede permissão pro usuário para acessar as fotos
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+        if (permissionResult.granted === false) {
+            alert("Você recusou a abrir suas fotos!");
+            return;
+        }
+
+        const response = await ImagePicker.launchImageLibraryAsync({ base64: true, allowsEditing: true, quality: 0.5 });
+
+        // Printando resultado
+        console.log(response);
+
+        if (!response.canceled) {
+            setImage(response.assets[0].uri);
+            console.log(response.assets[0].uri);
+        }
     }
 
     useEffect(() => { }, [])
@@ -128,12 +160,23 @@ export default function AppEdit({ route }) {
                 </TouchableOpacity>
             </View>
             <Text style={styles.title}>{fNome + ' ' + sNome + ' ' + empresa}</Text>
-            <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.inputContainer}>
+            <View style={styles.imageAvatar}>
+                <TouchableOpacity onPress={() => imageChange()}>
+                    <Avatar
+                        size={72}
+                        image={{ uri: image }}
+                        label={fNome}
+                        icon={props => <Icon name="account" {...props} />}>
+                    </Avatar>
+                </TouchableOpacity>
+            </View>
+            <ScrollView  automaticallyAdjustKeyboardInsets={true} style={styles.scrollContainer} contentContainerStyle={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
                     clearButtomMode="always"
                     value={fNome}
                     onChangeText={fNomeChanged}
+                    placeholder="Primeiro Nome"
                 />
                 <TextInput
                     editable={true}
@@ -141,12 +184,14 @@ export default function AppEdit({ route }) {
                     clearButtomMode="always"
                     value={sNome}
                     onChangeText={sNomeChanged}
+                    placeholder="Segundo Nome"
                 />
                 <TextInput
                     editable={true}
                     style={styles.input}
                     clearButtomMode="always"
                     value={empresa}
+                    placeholder="Empresa"
                     onChangeText={empresaChanged}
                 />
                 <TextInput
@@ -154,6 +199,7 @@ export default function AppEdit({ route }) {
                     style={styles.input}
                     clearButtomMode="always"
                     value={telefone}
+                    placeholder="Telefone"
                     onChangeText={telefoneChanged}
                 />
                 <TextInput
@@ -161,6 +207,7 @@ export default function AppEdit({ route }) {
                     style={styles.input}
                     clearButtomMode="always"
                     value={email}
+                    placeholder="E-mail"
                     onChangeText={emailChanged}
                 />
                 <TextInput
@@ -168,6 +215,7 @@ export default function AppEdit({ route }) {
                     style={styles.input}
                     clearButtomMode="always"
                     value={dataNasc}
+                    placeholder="Data de Nascimento"
                     onChangeText={dataNascChanged}
                 />
                 <TextInput
@@ -175,6 +223,7 @@ export default function AppEdit({ route }) {
                     style={styles.input}
                     clearButtomMode="always"
                     value={end}
+                    placeholder="Endereço"
                     onChangeText={endChanged}
                 />
                 <TextInput
@@ -182,6 +231,7 @@ export default function AppEdit({ route }) {
                     style={styles.input}
                     clearButtomMode="always"
                     value={apelido}
+                    placeholder="Apelido"
                     onChangeText={apelidoChanged}
                 />
                 <TextInput
@@ -189,6 +239,7 @@ export default function AppEdit({ route }) {
                     style={styles.input}
                     clearButtomMode="always"
                     value={notas}
+                    placeholder="Notas"
                     onChangeText={notasChanged}
                 />
                 <View style={styles.inputContainer}>
@@ -209,6 +260,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#000',
         alignItems: 'center',
     },
+    imageAvatar:{
+        alignContent: 'center',
+        alignSelf: 'center',
+        marginTop: 5,
+      },
     line: {
         display: 'flex',
         flexDirection: 'row',
@@ -227,7 +283,7 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
         flex: 1,
-        marginTop: 30,
+        marginTop: 5,
         width: '100%',
         padding: 20,
         borderTopLeftRadius: 10,

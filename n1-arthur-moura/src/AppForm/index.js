@@ -1,7 +1,11 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { Avatar } from "@react-native-material/core";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import Icon from "@expo/vector-icons/MaterialCommunityIcons";
+import * as ImagePicker from 'expo-image-picker';
+import { CheckBox } from "@rneui/themed";
 
 
 export default function AppForm() {
@@ -11,6 +15,8 @@ export default function AppForm() {
     navigation.navigate('AppList');
   }
 
+  const [me, setMe] = useState(false);
+  const [image, setImage] = useState(null)
   const [fNome, setFNome] = useState('');
   const [sNome, setsNome] = useState('');
   const [empresa, setEmpresa] = useState('');
@@ -57,12 +63,42 @@ export default function AppForm() {
     setNotas(notas);
   }
 
+  const imageChange = async () => {
+    // Pede permissão pro usuário para acessar as fotos
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert("Você recusou a abrir suas fotos!");
+      return;
+    }
+
+    const response = await ImagePicker.launchImageLibraryAsync({ base64: true, allowsEditing: true, quality: 0.5 });
+
+    // Printando resultado
+    console.log(response);
+
+    if (!response.canceled) {
+      setImage(response.assets[0].uri);
+      console.log(response.assets[0].uri);
+    }
+  }
+
   async function botaoPressed() {
-    const item = { id: new Date().getTime(), fNome, sNome, empresa, telefone, email, dataNasc, end, apelido, notas };
+    const item = { id: new Date().getTime(), fNome, sNome, empresa, telefone, email, dataNasc, end, apelido, notas, image, me };
     let items = [];
     const response = await AsyncStorage.getItem('items');
 
     if (response) items = JSON.parse(response);
+
+    if (me == true) {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].me == true) {
+          alert("Você já tem um contato seu!");
+          return;
+        }
+      }
+
+    }
 
     items.push(item);
 
@@ -70,7 +106,7 @@ export default function AppForm() {
 
     await AsyncStorage.setItem('items', JSON.stringify(items));
 
-
+    retornarList();
   }
 
   return (
@@ -88,7 +124,19 @@ export default function AppForm() {
         </TouchableOpacity>
       </View>
       <Text style={styles.title}>Novo Contato</Text>
-      <View style={styles.inputContainer}>
+      <View style={styles.imageAvatar}>
+        <TouchableOpacity onPress={() => imageChange()}>
+          <Avatar
+            size={72}
+            image={{ uri: image }}
+            icon={props => <Icon name="account" {...props} />}>
+          </Avatar>
+        </TouchableOpacity>
+      </View>
+      <ScrollView
+        automaticallyAdjustKeyboardInsets={true}
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.inputContainer}>
         <TextInput
           marginTop="5"
           style={styles.input}
@@ -148,13 +196,26 @@ export default function AppForm() {
           clearButtomMode="always"
           onChangeText={notasChanged}
         />
-      </View>
+        <CheckBox
+          containerStyle={styles.check}
+          checkedTitle="Sou eu!"
+          uncheckedColor="red"
+          checkedColor="blue"
+          title="Eu"
+          checked={me}
+          onPress={() => setMe(!me)}
+        />
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: '#000'
+  },
+  check: {
     flex: 1,
     backgroundColor: '#000'
   },
@@ -165,6 +226,11 @@ const styles = StyleSheet.create({
     marginTop: 50,
     alignContent: 'stretch'
   },
+  imageAvatar: {
+    alignContent: 'center',
+    alignSelf: 'center',
+    marginTop: 5,
+  },
   title: {
     color: "#FFF",
     fontSize: 30,
@@ -172,16 +238,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'center'
   },
+  scrollContainer: {
+    flex: 1,
+    width: '100%'
+  },
   inputContainer: {
     flex: 1,
-    marginTop: 30,
-    width: '90%',
+    marginTop: 5,
+    width: '100%',
     padding: 20,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     alignItems: 'stretch',
-    backgroundColor: '#000',
-    alignSelf: 'center'
+    backgroundColor: '#000'
   },
   input: {
     marginTop: 5,
