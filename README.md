@@ -7,8 +7,8 @@
 * React-native
 * React
 * JavaScript
-## Como iniciar:
-1. Deve-se ter tanto expo quanto node instalados no seu computador, a partir dai na pasta raíz do projeto deve-se abrir um terminar e utilizar "npm install".
+## Primeiros Passos:
+1. Deve-se ter tanto expo quanto node instalados no seu computador, a partir dai na pasta raíz do projeto deve-se abrir um terminal e utilizar "npm install".
 2. npm start.
 3. expo start.
 4. Uma vez conectado na mesma rede que seu computador que buildou o projeto deve-se apontar a câmera do celular para o QR code. 
